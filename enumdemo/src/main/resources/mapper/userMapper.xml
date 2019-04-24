@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.springboot.enumdemo.mapper.UserMapper">
+    <select id="findUserByName" parameterType="String" resultType="user">
+        SELECT
+          tu.id as id,
+          tu.user_name as userName,
+          tu.sex as sex,
+          tu.note as note
+        FROM
+          t_user tu
+        WHERE
+          tu.user_name = #{userName}
+    </select>
+
+    <insert id="addUser" parameterType="user">
+        INSERT INTO
+          t_user (id, user_name, sex, note)
+        VALUES
+          (#{tuser.id}, #{tuser.userName}, #{tuser.sex}, #{tuser.note})
+    </insert>
+
+    <update id="modifyUser" parameterType="user">
+        UPDATE t_user
+        <set>
+            <if test="tuser.userName != null">user_name = #{tuser.userName},</if>
+            <if test="tuser.sex != null">sex = #{tuser.sex},</if>
+            <if test="tuser.note != null">note = #{tuser.note}</if>
+        </set>
+        WHERE id = #{tuser.id}
+    </update>
+</mapper>

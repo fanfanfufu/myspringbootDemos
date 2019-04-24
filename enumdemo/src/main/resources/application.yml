@@ -1,0 +1,14 @@
+server:
+  port: 8888
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://172.16.9.96:3307/springboot?useSSL=false&useUnicode=true&characterEncoding=utf8
+    username: root
+    password: 123456
+
+mybatis:
+  type-aliases-package: com.springboot.enumdemo.pojo
+  mapper-locations: classpath:mapper/*.xml
+  type-handlers-package: com.springboot.enumdemo.typehandler
