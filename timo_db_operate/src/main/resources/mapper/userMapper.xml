@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.springboot.timo_db_operate.mapper.UserMapper">
+    <resultMap id="userMap" type="com.springboot.timo_db_operate.pojo.User">
+        <id column="id" property="userId" />
+        <result column="username" property="username" />
+        <result column="nickname" property="nickname" />
+        <result column="password" property="password" />
+        <result column="salt" property="salt" />
+        <result column="picture" property="picture" />
+        <result column="sex" property="sex" />
+        <result column="email" property="email" />
+        <result column="phone" property="phone" />
+        <result column="remark" property="remark" />
+        <result column="create_date" property="createDate" />
+        <result column="update_date" property="updateDate" />
+        <result column="status" property="status" />
+        <association column="dept_id" property="dept" javaType="com.springboot.timo_db_operate.pojo.Dept" resultMap="deptMap" />
+    </resultMap>
+
+    <resultMap id="deptMap" type="dept">
+        <id column="id" property="id" />
+        <result column="title" property="title" />
+        <result column="sort" property="sort" />
+        <result column="create_date" property="createTime" />
+        <result column="update_date" property="updateTime" />
+    </resultMap>
+
+    <select id="findAllUser" resultMap="userMap">
+        SELECT
+               u.id,
+               u.username,
+               u.nickname,
+               u.password,
+               u.salt,
+               d.id,
+               d.title,
+               d.sort,
+               d.create_date,
+               d.update_date,
+               d.status,
+               u.picture,
+               u.sex,
+               u.email,
+               u.remark,
+               u.create_date,
+               u.update_date,
+               u.status
+        FROM timo.sys_user u
+        LEFT JOIN timo.sys_dept d
+        ON u.dept_id = d.id
+    </select>
+
+    <select id="findByCondition" resultMap="userMap">
+        SELECT
+            u.id,
+            u.username,
+            u.nickname,
+            u.password,
+            u.salt,
+            d.id,
+            d.title,
+            d.sort,
+            d.create_date,
+            d.update_date,
+            d.status,
+            u.picture,
+            u.sex,
+            u.email,
+            u.remark,
+            u.create_date,
+            u.update_date,
+            u.status
+        FROM timo.sys_user u
+        LEFT JOIN timo.sys_dept d
+        ON u.dept_id = d.id
+        WHERE u.status = #{status}
+        <if test="username != null and username != ''">
+            AND u.username = #{username}
+        </if>
+        <if test="nickname != null and nickname != ''">
+            AND u.nickname = #{nickname}
+        </if>
+        <if test="title != null and title != ''">
+            AND d.title = #{title}
+        </if>
+    </select>
+
+    <delete id="deleteUser" parameterType="User">
+        DELETE FROM timo.sys_user WHERE username = #{username}
+    </delete>
+
+    <insert id="addUser" parameterType="user">
+        INSERT INTO
+          timo.sys_user (id, username, nickname, password, salt, dept_id, picture, sex, email, phone, remark, create_date, update_date, status)
+        VALUES (#{user.userId},
+                #{user.username},
+                #{user.nickname},
+                #{user.password},
+                #{user.salt},
+                #{user.dept.id},
+                #{user.picture},
+                #{user.sex},
+                #{user.email},
+                #{user.phone},
+                #{user.remark},
+                #{user.createTime},
+                #{user.updateTime},
+                #{user.status}
+                )
+    </insert>
+
+    <!-- 更新用户信息 -->
+    <update id="modifyMessage" parameterType="user">
+        UPDATE
+          timo.sys_user
+        <set>
+            <if test="user.username != null">username = #{user.username},</if>
+            <if test="user.nickname != null">nickname = #{user.nickname},</if>
+            <if test="user.dept.id != null">dept_id = #{user.dept.id},</if>
+            <if test="user.picture != null">picture = #{user.picture},</if>
+            <if test="user.sex != null">email = #{user.email},</if>
+            <if test="user.phone != null">phone = #{user.phone},</if>
+            <if test="user.remark != null">remark = #{user.remark},</if>
+            <if test="user.updateTime != null">create_date = #{user.updateTime},</if>
+            <if test="user.status != 0">sys_user.status = #{user.status}</if>
+        </set>
+        WHERE
+          id = #{user.userId}
+    </update>
+
+    <!-- 修改密码 -->
+    <update id="modifyPassword">
+        UPDATE
+          timo.sys_user
+        SET
+          password = #{newPassword}
+        WHERE
+          id = #{user.userId}
+        AND
+          username = #{user.username}
+    </update>
+</mapper>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.springboot.timo_db_operate.mapper.ActionLogMapper">
+
+    <resultMap id="actionLogMap" type="actionLog">
+        <id column="id" property="logId" />
+        <result column="name" property="logName" />
+        <result column="type" property="logType" />
+        <result column="ipaddr" property="ipAddress" />
+        <result column="clazz" property="clazz" />
+        <result column="method" property="method" />
+        <result column="model" property="model" />
+        <result column="record_id" property="recordId" />
+        <result column="message" property="message" />
+        <result column="create_date" property="createTime" />
+        <result column="oper_name" property="operatorName" />
+        <result column="oper_by" property="operateBy" />
+    </resultMap>
+
+    <insert id="addActionLog" parameterType="actionLog">
+        INSERT INTO timo.sys_action_log
+                (name, type, ipaddr, clazz, method, model, record_id, message, create_date, oper_name, oper_by)
+        VALUES (#{actionLog.logName},
+                #{actionLog.logType},
+                #{actionLog.ipAddress},
+                #{actionLog.clazz},
+                #{actionLog.method},
+                #{actionLog.model},
+                #{actionLog.recordId},
+                #{actionLog.message},
+                #{actionLog.createTime},
+                #{actionLog.operatorName},
+                #{actionLog.operateBy})
+    </insert>
+
+    <delete id="deleteOneLog" parameterType="java.lang.Long">
+        DELETE FROM timo.sys_action_log
+        WHERE id = #{logId}
+    </delete>
+
+    <delete id="deleteManyLog">
+        DELETE FROM timo.sys_action_log
+        <where>
+            <if test="logName != null and logName != ''">
+                name = #{logName}
+            </if>
+            <if test="logType != 0">
+                AND type = #{logType}
+            </if>
+        </where>
+    </delete>
+
+    <delete id="deleteAllLog">
+        TRUNCATE TABLE timo.sys_action_log
+    </delete>
+
+    <sql id="actionLogColumns">
+        id, name, type, ipaddr, clazz, method, model, record_id, message, create_date, oper_name, oper_by
+    </sql>
+
+    <select id="getAllLog" resultMap="actionLogMap">
+        SELECT <include refid="actionLogColumns" />
+        FROM timo.sys_action_log
+    </select>
+
+    <select id="getByCondition" resultMap="actionLogMap">
+        SELECT <include refid="actionLogColumns" />
+        FROM timo.sys_action_log
+        where
+        <if test="logName != null and logName != ''">
+            name LIKE CONCAT(CONCAT('%', #{logName}), '%')
+        </if>
+        <if test="logType != 0">
+            AND type = #{logType}
+        </if>
+    </select>
+</mapper>

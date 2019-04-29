@@ -1,0 +1,38 @@
+server:
+  port: 8888
+
+spring:
+  # redis相关配置
+#  redis:
+#    lettuce:
+#      pool:
+#        max-active: 50
+#        max-wait: 3000ms
+#        max-idle: 20
+#        min-idle: 2
+#      shutdown-timeout: 5000ms
+#    host: 172.16.9.96
+#    port: 6888
+#    timeout: 5000ms
+#    database: 3
+
+  # MySQL相关配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://172.16.9.96:3307/timo?useSSL=false&useUnicode=true&characterEncoding=utf8&serverTimezone=CTT
+    username: root
+    password: 123456
+
+  # 全局设置时间格式
+#  jackson:
+#    date-format: yyyy-MM-dd HH:mm:ss
+#    time-zone: GMT+8
+#    serialization:
+#      write-dates-as-timestamps: false
+
+# mybatis相关配置
+mybatis:
+#  config-location: classpath:mapper/config/*.xml
+  mapper-locations: classpath:mapper/*.xml
+  # 配置实体类包的别名
+  type-aliases-package: com.springboot.timo_db_operate.pojo

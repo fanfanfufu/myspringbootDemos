@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.springboot.timo_db_operate.mapper.RoleMapper">
+    <resultMap id="roleMap" type="role">
+        <id column="id" property="roleId" />
+        <result column="title" property="roleName" />
+        <result column="name" property="name" />
+        <result column="remark" property="remark" />
+        <result column="create_date" property="createTime" />
+        <result column="update_date" property="updateTime" />
+        <result column="status" property="roleStatus" />
+        <association column="create_by" property="createBy" javaType="com.springboot.timo_db_operate.pojo.User" select="createUser" />
+        <association column="update_by" property="createBy" javaType="com.springboot.timo_db_operate.pojo.User" select="updateUser" />
+    </resultMap>
+
+    <resultMap id="userMap" type="user">
+        <id column="uid" property="userId" />
+        <result column="username" property="username" />
+    </resultMap>
+
+    <select id="createUser" resultMap="userMap">
+        SELECT
+            u.id uid,
+            u.username
+        FROM
+            timo.sys_user u
+        WHERE
+            u.id = #{create_by}
+    </select>
+
+    <!--<resultMap id="updateUserMap" type="user">
+        <id column="uid" property="userId" />
+        <result column="username" property="username" />
+    </resultMap>-->
+
+    <select id="updateUser" resultMap="userMap">
+        SELECT
+            u.id uid,
+            u.username
+        FROM
+            timo.sys_user u
+        WHERE
+            u.id = #{update_by}
+    </select>
+
+    <insert id="addRole" parameterType="role">
+        INSERT INTO
+            timo.sys_role (title, name, remark, create_date, update_date, create_by, update_by, status)
+        VALUES
+            (#{role.roleName},
+             #{role.name},
+             #{role.remark},
+             #{role.createTime},
+             #{role.updateTime},
+             #{role.createBy.userId},
+             #{role.updateBy.userId},
+             #{role.roleStatus})
+    </insert>
+
+    <delete id="deleteRole">
+        DELETE FROM timo.sys_role
+        WHERE title = #{roleName}
+    </delete>
+
+    <update id="modifyRole" parameterType="role">
+        UPDATE timo.sys_role
+        <set>
+            <if test="role.roleName != null">title = #{role.roleName},</if>
+            <if test="role.name != null">name = #{role.name},</if>
+            <if test="role.remark != null">remark = #{role.remark},</if>
+            <if test="role.updateTime != null">update_date = #{role.updateTime},</if>
+            <if test="role.updateBy != null">update_by = #{role.updateBy.userId},</if>
+            <if test="role.roleStatus != 0">status = #{role.roleStatus},</if>
+        </set>
+        WHERE id = #{role.roleId}
+    </update>
+
+    <sql id="roleColumns">sys_role.id, title, name, remark, create_date, update_date, create_by, update_by, status</sql>
+
+    <select id="getAllRoles" resultMap="roleMap">
+        SELECT <include refid="roleColumns" />
+        FROM timo.sys_role
+    </select>
+
+    <select id="getRoleByCondition" resultMap="roleMap">
+        SELECT <include refid="roleColumns" />
+        FROM timo.sys_role
+        WHERE status = #{roleStatus}
+        <if test="name != null and name != ''">
+            AND name = #{name}
+        </if>
+        <if test="roleName != null and roleName != ''">
+            AND title = #{roleName}
+        </if>
+    </select>
+</mapper>

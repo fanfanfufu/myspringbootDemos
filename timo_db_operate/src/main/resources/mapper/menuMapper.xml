@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.springboot.timo_db_operate.mapper.MenuMapper">
+    <resultMap id="menuMap" type="menu">
+        <id column="id" property="menuId" />
+        <result column="title" property="menuName" />
+        <result column="pid" property="pid" />
+        <result column="pids" property="pids" />
+        <result column="url" property="url" />
+        <result column="perms" property="perms" />
+        <result column="icon" property="icon" />
+        <result column="type" property="type" />
+        <result column="sort" property="sort" />
+        <result column="remark" property="remark" />
+        <result column="create_date" property="createTime" />
+        <result column="update_date" property="updateTime" />
+        <result column="status" property="menuStatus" />
+        <association column="create_by" property="createBy" javaType="com.springboot.timo_db_operate.pojo.User" select="createUser" />
+        <association column="update_by" property="updateBy" javaType="com.springboot.timo_db_operate.pojo.User" select="updateUser" />
+    </resultMap>
+    
+    <resultMap id="userMap" type="user">
+        <!--<constructor>-->
+            <!--<idArg column="uid" javaType="Long" />-->
+            <!--<arg column="username" javaType="String" />-->
+        <!--</constructor>-->
+        <id column="uid" property="userId" />
+        <result column="username" property="username" />
+    </resultMap>
+    
+    <select id="createUser" resultMap="userMap">
+        SELECT u.id uid, u.username
+        FROM timo.sys_user u
+        WHERE u.id = #{create_by}
+    </select>
+    
+    <select id="updateUser" resultMap="userMap">
+        SELECT u.id uid, u.username
+        FROM timo.sys_user u 
+        WHERE u.id = #{update_by}
+    </select>
+
+    <insert id="addMenu" parameterType="menu">
+        INSERT INTO timo.sys_menu
+            (title,
+             pid,
+             pids,
+             url,
+             perms,
+             icon,
+             type,
+             sort,
+             remark,
+             create_date,
+             update_date,
+             create_by,
+             update_by,
+             status)
+        VALUES
+               (#{menu.menuName},
+                #{menu.pid},
+                #{menu.pids},
+                #{menu.url},
+                #{menu.perms},
+                #{menu.icon},
+                #{menu.type},
+                #{menu.sort},
+                #{menu.remark},
+                #{menu.createTime},
+                #{menu.updateTime},
+                #{menu.createBy.userId},
+                #{menu.updateBy.userId},
+                #{menu.menuStatus})
+    </insert>
+
+    <delete id="deleteMenu" parameterType="java.lang.String">
+        DELETE FROM timo.sys_menu
+        WHERE title = #{menuName}
+    </delete>
+
+    <update id="modifyMenu" parameterType="menu">
+        UPDATE timo.sys_menu sm
+        <set>
+            <if test="menu.menuName != null">sm.title = #{menu.menuName},</if>
+            <if test="menu.pid != 0">sm.pid = #{menu.pid},</if>
+            <if test="menu.pids != null">sm.pids = #{menu.pids},</if>
+            <if test="menu.url != null">sm.url = #{menu.url},</if>
+            <if test="menu.perms != null">sm.perms = #{menu.perms},</if>
+            <if test="menu.icon != null">sm.icon = #{menu.icon},</if>
+            <if test="menu.type != 0">sm.type = #{menu.type},</if>
+            <if test="menu.sort != 0">sm.sort = #{menu.sort},</if>
+            <if test="menu.remark != null">sm.remark = #{menu.remark},</if>
+            <if test="menu.updateTime != null">sm.update_date = #{menu.updateTime},</if>
+            <if test="menu.updateBy != null">sm.update_by = #{menu.updateBy.userId},</if>
+            <if test="menu.menuStatus != 0">sm.status = #{menu.menuStatus}</if>
+        </set>
+        WHERE sm.id = #{menu.menuId}
+    </update>
+
+    <sql id="menuColumns">
+        id, title, pid, pids, url, perms, icon, type, sort, remark, create_date, update_date, create_by, update_by, status
+    </sql>
+
+    <select id="getAllMenu" resultMap="menuMap">
+        SELECT <include refid="menuColumns" />
+        FROM timo.sys_menu
+    </select>
+
+    <select id="getMenuByCondition" resultMap="menuMap">
+        SELECT <include refid="menuColumns" />
+        FROM timo.sys_menu sm
+        WHERE sm.status = #{menuStatus}
+        <if test="menuName != null and menuName != ''">
+            AND sm.title LIKE CONCAT(CONCAT('%', #{menuName}), '%')
+        </if>
+        <if test="url != null and url != ''">
+            AND sm.url LIKE CONCAT(CONCAT('%', #{url}), '%')
+        </if>
+        LIMIT 501
+    </select>
+</mapper>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.springboot.timo_db_operate.mapper.DictMapper">
+    <resultMap id="userMap" type="user">
+        <id column="uid" property="userId" />
+        <result column="username" property="username" />
+    </resultMap>
+    
+    <select id="createUser" resultMap="userMap">
+        SELECT u.id uid, u.username
+        FROM timo.sys_user u
+        WHERE u.id = #{create_by}
+    </select>
+    
+    <select id="updateUser" resultMap="userMap">
+        SELECT u.id uid, u.username
+        FROM timo.sys_user u 
+        WHERE u.id = #{update_by}
+    </select>
+    
+    <resultMap id="dictMap" type="dict">
+        <id column="id" property="dictId" />
+        <result column="title" property="dictTitle" />
+        <result column="name" property="dictName" />
+        <result column="type" property="dictType" />
+        <result column="value" property="dictValue" />
+        <result column="remark" property="dictRemark" />
+        <result column="create_date" property="createTime" />
+        <result column="update_date" property="updateTime" />
+        <result column="status" property="dictStatus" />
+        <association column="create_by" property="createBy" javaType="com.springboot.timo_db_operate.pojo.Dict" select="createUser" />
+        <association column="update_by" property="updateBy" javaType="com.springboot.timo_db_operate.pojo.Dict" select="updateUser" />
+    </resultMap>
+    
+    <insert id="addDict" parameterType="dict">
+        INSERT INTO timo.sys_dict
+                (title,
+                 name,
+                 type,
+                 value,
+                 remark,
+                 create_date,
+                 update_date,
+                 create_by,
+                 update_by,
+                 status)
+        VALUES (#{dict.dictTitle},
+                #{dict.dictName},
+                #{dict.dictType},
+                #{dict.dictValue},
+                #{dict.dictRemark},
+                #{dict.createTime},
+                #{dict.updateTime},
+                #{dict.createBy.userId},
+                #{dict.updateBy.userId},
+                #{dict.dictStatus})
+    </insert>
+
+    <delete id="deleteDict" parameterType="String">
+        DELETE FROM timo.sys_dict
+        WHERE title = #{dictTitle} AND name = #{dictName}
+    </delete>
+
+    <update id="modifyDict" parameterType="dict">
+        UPDATE timo.sys_dict sd
+        <set>
+            <if test="dict.dictTitle != null">sd.title = #{dict.dictTitle},</if>
+            <if test="dict.dictName != null">sd.name = #{dict.dictName},</if>
+            <if test="dict.dictType != 0">sd.type = #{dict.dictType},</if>
+            <if test="dict.dictValue != null">sd.value = #{dict.dictValue},</if>
+            <if test="dict.dictRemark != null">sd.remark = #{dict.dictRemark},</if>
+            <if test="dict.updateTime != null">sd.update_date = #{dict.updateTime},</if>
+            <if test="dict.updateBy != null">sd.update_by = #{dict.updateBy.userId},</if>
+            <if test="dict.dictStatus != 0">sd.status = #{dict.dictStatus}</if>
+        </set>
+        WHERE sd.id = #{dict.dictId}
+    </update>
+
+    <sql id="dictColumns">
+        sd.id, sd.title, sd.name, sd.type, sd.value, sd.remark, sd.create_date, sd.update_date, sd.create_by, sd.update_by, sd.status
+    </sql>
+
+    <select id="getAllDict" resultMap="dictMap">
+        SELECT <include refid="dictColumns" />
+        FROM timo.sys_dict sd
+    </select>
+
+    <select id="getByCondition" resultMap="dictMap">
+        SELECT <include refid="dictColumns" />
+        FROM timo.sys_dict sd
+        WHERE sd.status = #{dictStatus}
+        <if test="dictTitle != null and dictTitle != ''">
+            AND sd.title LIKE concat(concat('%', #{dictTitle}), '%')
+        </if>
+        <if test="dictName != null and dictName != ''">
+            AND sd.name LIKE CONCAT(CONCAT('%', #{dictName}), '%')
+        </if>
+        LIMIT 501
+    </select>
+</mapper>
