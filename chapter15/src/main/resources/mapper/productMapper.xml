@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.springboot.chapter15.mapper.ProductMapper">
+    <resultMap id="productMap" type="product">
+        <id property="productId" column="id" />
+        <result property="productName" column="product_name" />
+        <result property="stock" column="stock" />
+        <result property="price" column="price" />
+        <result property="version" column="version" />
+        <result property="note" column="note" />
+    </resultMap>
+    
+    <sql id="product_columns">
+        id, product_name, stock, price, version, note
+    </sql>
+
+    <!-- 最后加上 for update表示使用悲观锁-->
+    <select id="getProduct" resultMap="productMap">
+        SELECT <include refid="product_columns" />
+        FROM springboot.t_product
+        WHERE id = #{productId} for update 
+    </select>
+
+    <update id="decreaseProduct">
+        UPDATE springboot.t_product
+        <set>
+            <if test="quantity != null and quantity != 0">stock = stock - #{quantity}</if>
+        </set>
+        WHERE id = #{productId}
+    </update>
+</mapper>
