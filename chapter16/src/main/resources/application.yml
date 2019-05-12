@@ -1,0 +1,27 @@
+server:
+  port: 9000
+
+spring:
+  application:
+    name: spring-boot-actuator-test
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+      # 代表启用单独的url来监控Spring Boot应用，为了安全一般都是启用独立的端口来访问后端的监控信息
+      # Actuator 默认所有的监控点路径都在/actuator/*
+      # 这里设置了之后，访问地址就变成了/monitor
+      base-path: /monitor
+  endpoint:
+    health:
+      show-details: always
+    shutdown:
+      # 启用接口关闭Spring boot
+      enabled: true
+# 自定义的配置信息
+info:
+  app:
+    name: spring-boot-actuator-test
+    version: 1.0.0
+    test: test
