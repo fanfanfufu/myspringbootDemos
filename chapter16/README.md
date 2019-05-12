@@ -283,3 +283,5 @@ info 就是我们自己配置在配置文件中以 info 开头的配置信息
                     "fileName": "ServerSocketChannelImpl.java",
                     "lineNumber": -2,
                     ...
+
+参考链接：[使用Spring Boot Actuator监控应用](http://www.ityouknow.com/springboot/2018/02/06/spring-boot-actuator.html)
